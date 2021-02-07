@@ -34,6 +34,9 @@ class VRChatActivityLogsDao:
             """, self.conn)
         return df
 
+    def query(self, query):
+        return ps.read_sql(query, self.conn)
+
 
 if __name__ == "__main__":
     dao = VRChatActivityLogsDao()
