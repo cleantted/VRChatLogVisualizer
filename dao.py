@@ -34,6 +34,30 @@ class VRChatActivityLogsDao:
             """, self.conn)
         return df
 
+    def fetch_world_join_time(self):
+        df = ps.read_sql(f"""
+            select
+                {self.__column_name["world_name"]},
+                {self.__column_name["timestamp"]}
+            from {self.__table_name}
+            where
+                {self.__column_name["activity_type"]} = 0
+        """, self.conn)
+        return df 
+
+    def fetch_user_meet_data(self, time_start, time_end): 
+        df = ps.read_sql(f"""
+            select 
+                {self.__column_name["user_name"]},
+                {self.__column_name["timestamp"]}
+            from {self.__table_name}
+            where
+                {self.__column_name["activity_type"]} = 1
+                and {self.__column_name["timestamp"]} 
+                    between '{time_start}' and '{time_end}'
+        """, self.conn)
+        return df
+
     def query(self, query):
         return ps.read_sql(query, self.conn)
 
