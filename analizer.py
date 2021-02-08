@@ -9,9 +9,8 @@ def is_near_time(a_str, b_str):
     return (date_dt2 - date_dt1).seconds <= 1
 
 
-def world_join_status():
-    activity_logs_dao = dao.VRChatActivityLogsDao()
-    df = activity_logs_dao.fetch_world_join_time()
+def fetch_world_stay_time(dao):
+    df = dao.fetch_world_join_time()
     L = df.values.tolist()
     L.append(["", "9999-99-99 23:59:59"])
 
@@ -21,9 +20,13 @@ def world_join_status():
         L[i + 1][1],
     ) for i in range(len(L) - 1)]
 
+    return world_data
+
+
+def fetch_players_in_world(dao, world_data):
     players = []
     for world_name, time_start, time_end in world_data:
-        table = activity_logs_dao.fetch_user_meet_data(time_start, time_end) 
+        table = dao.fetch_user_meet_data(time_start, time_end) 
         time_in_list = table[table["UserName"] == "cleantted"]["Timestamp"].values.tolist()
         if not time_in_list:
             print(f"not fount cleantted in world '{world_name}'\ntable: {table}")
@@ -34,7 +37,10 @@ def world_join_status():
             continue
         players.append((world_name, time_in, users))
     # print(players)
+    return players
 
+
+def show_join_or_joined(players):
     meet_to_me = {}
     i_meet_who = {}
     for i, (world, time, pls) in enumerate(players):
@@ -69,5 +75,7 @@ def world_join_status():
 
 
 if __name__ == "__main__":
-    world_join_status()
-
+    activity_logs_dao = dao.VRChatActivityLogsDao()
+    world_data = fetch_world_stay_time(activity_logs_dao)
+    players = fetch_players_in_world(activity_logs_dao, world_data)
+    show_join_or_joined(players)
