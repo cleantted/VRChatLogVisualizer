@@ -32,11 +32,10 @@ def fetch_players_in_world(dao, world_data):
             print(f"not fount cleantted in world '{world_name}'\ntable: {table}")
             continue
         time_in = time_in_list[0]
-        users = table.values.tolist()
+        users = complete_player_data(table.values.tolist())
         if not users:
             continue
         players.append((world_name, time_in, users))
-    # print(players)
     return players
 
 
@@ -46,13 +45,13 @@ def show_join_or_joined(players):
     for i, (world, time, pls) in enumerate(players):
         if world == "VRChat Home":
             continue
-        already_player = set(pl for pl, time_in in pls if is_near_time(time, time_in))
+        already_player = set(pl for pl, time_in, _ in pls if is_near_time(time, time_in))
         for pl in already_player:
             if pl == "cleantted":
                 continue
             i_meet_who[pl] = i_meet_who.setdefault(pl, 0) + 1
 
-        comming_player = set(pl for pl, time_in in pls if not is_near_time(time, time_in))
+        comming_player = set(pl for pl, time_in, _ in pls if not is_near_time(time, time_in))
         for pl in comming_player:
             meet_to_me[pl] = meet_to_me.setdefault(pl, 0) + 1
 

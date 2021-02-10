@@ -53,10 +53,11 @@ class VRChatActivityLogsDao:
             f"""
                 select 
                     {self.__column_name["user_name"]},
-                    {self.__column_name["timestamp"]}
+                    {self.__column_name["timestamp"]},
+                    {self.__column_name["activity_type"]}
                 from {self.__table_name}
                 where
-                    {self.__column_name["activity_type"]} = 1
+                    {self.__column_name["activity_type"]} in (1, 9)
                     and {self.__column_name["timestamp"]} 
                         between '{time_start}' and '{time_end}'
             """, self.conn)
