@@ -45,6 +45,7 @@ class VRChatActivityLogsDao:
                 from {self.__table_name}
                 where
                     {self.__column_name["activity_type"]} = 0
+                order by {self.__column_name["timestamp"]} asc
             """, self.conn)
         return df 
 
@@ -60,6 +61,7 @@ class VRChatActivityLogsDao:
                     {self.__column_name["activity_type"]} in (1, 9)
                     and {self.__column_name["timestamp"]} 
                         between '{time_start}' and '{time_end}'
+                order by {self.__column_name["timestamp"]} asc
             """, self.conn)
         return df
 
