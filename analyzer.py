@@ -3,6 +3,7 @@ import dao
 import datetime
 import heapq
 import operator
+import sys
 
 
 def is_near_time(a_str, b_str):
@@ -49,20 +50,20 @@ class Analyzer:
         for user_name, timestamp, activity_type in players: 
             if activity_type == 1:
                 if user_name in buffer:
-                    print(f"[error] already added: {user_name} at {timestamp}")
+                    print(f"[error] already added: {user_name} at {timestamp}", file=sys.stderr)
                     continue
 
                 buffer[user_name] = timestamp
             elif activity_type == 9:
                 if user_name not in buffer:
-                    print(f"[error] not exist: {user_name} at {timestamp}")
+                    print(f"[error] not exist: {user_name} at {timestamp}", file=sys.stderr)
                     continue
                 player_data.append((buffer.pop(user_name), timestamp, user_name))
             else:
-                print(f"[error] unknown type: {activity_type} of {user_name} at {timestamp}")
+                print(f"[error] unknown type: {activity_type} of {user_name} at {timestamp}", file=sys.stderr)
         
         for user_name, timestamp in buffer.items():
-            print(f"[warn] not leaved: {user_name} from {timestamp}")
+            print(f"[warn] not left: {user_name} from {timestamp}", file=sys.stderr)
             player_data.append((timestamp, self.__invalid_datetime, user_name))
         player_data.sort()
         # print(player_data)
@@ -74,7 +75,7 @@ class Analyzer:
             table = self.__dao.fetch_user_meet_data(time_start, time_end) 
             time_in_list = table[table["UserName"] == self.__orner_name]["Timestamp"].values.tolist()
             if not time_in_list:
-                print(f"not fount {self.__orner_name} in world '{world_name}'\ntable: {table}")
+                print(f"[error] not found {self.__orner_name} in world '{world_name}'\ntable: {table}", file=sys.stderr)
                 continue
             time_in = time_in_list[0]
             users = self.complete_player_data(table.values.tolist())
