@@ -1,3 +1,4 @@
+import configparser
 import dao
 import datetime
 import heapq
@@ -21,11 +22,11 @@ def pickup(d, limit):
 
 class Analyzer:
     __invalid_datetime = "9999-99-99 23:59:59"
-    __orner_name = "cleantted"
-    __home_world = "VRChat Home"
 
-    def __init__(self):
+    def __init__(self, orner_name, home_world):
         self.__dao = dao.VRChatActivityLogsDao()
+        self.__orner_name = orner_name
+        self.__home_world = home_world
         self.fetch_world_stay_time()
         self.fetch_players_in_world()
         self.fetch_players_relation()
@@ -149,5 +150,11 @@ class Analyzer:
 
 
 if __name__ == "__main__":
-    analyzer = Analyzer()
+    config_ini = configparser.ConfigParser()
+    config_ini.read("./config.ini", encoding="utf-8")
+
+    orner_name = config_ini["setting"]["orner_name"]
+    home_world = config_ini["setting"]["home_world"]
+
+    analyzer = Analyzer(orner_name, home_world)
     print(analyzer.relation)
