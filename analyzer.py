@@ -48,13 +48,13 @@ class Analyzer:
         buffer = {}
         player_data = []
         for user_name, timestamp, activity_type in players: 
-            if activity_type == 1:
+            if activity_type == self.__dao.activity_type["met_player"]:
                 if user_name in buffer:
                     print(f"[error] already added: {user_name} at {timestamp}", file=sys.stderr)
                     continue
 
                 buffer[user_name] = timestamp
-            elif activity_type == 9:
+            elif activity_type == self.__dao.activity_type["leave_player"]:
                 if user_name not in buffer:
                     print(f"[error] not exist: {user_name} at {timestamp}", file=sys.stderr)
                     continue
