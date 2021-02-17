@@ -14,6 +14,18 @@ class VRChatActivityLogsDao:
         "world_id": "WorldID", 
         "world_name": "WorldName",
     }
+    __activity_type = {
+        "join_room": 0,
+        "met_player": 1,
+        "send_invite": 2,
+        "received_invite": 3,
+        "send_request_invite": 4,
+        "received_request_invite": 5,
+        "send_friend_request": 6,
+        "received_friend_request": 7,
+        "accept_friend_request": 8,
+        "leave_player": 9,
+    }
 
     def __init__(self, db_name="./VRChatActivityLog.db"):
         self.conn = sqlite3.connect(db_name)
@@ -29,7 +41,8 @@ class VRChatActivityLogsDao:
                     {self.__column_name["user_name"]}, 
                     count(*) 
                 from {self.__table_name} 
-                where {self.__column_name["activity_type"]} = 1
+                where {self.__column_name["activity_type"]} 
+                        = {self.__activity_type["met_player"]}
                 group by {self.__column_name["user_name"]}
                 order by 2 desc
                 limit {limit}
@@ -44,7 +57,8 @@ class VRChatActivityLogsDao:
                     {self.__column_name["timestamp"]}
                 from {self.__table_name}
                 where
-                    {self.__column_name["activity_type"]} = 0
+                    {self.__column_name["activity_type"]} 
+                        = {self.__activity_type["join_room"]} 
                 order by {self.__column_name["timestamp"]} asc
             """, self.conn)
         return df 
@@ -58,7 +72,9 @@ class VRChatActivityLogsDao:
                     {self.__column_name["activity_type"]}
                 from {self.__table_name}
                 where
-                    {self.__column_name["activity_type"]} in (1, 9)
+                    {self.__column_name["activity_type"]} 
+                        in ({self.__activity_type["met_player"]},
+                            {self.__activity_type["leave_player"]})
                     and {self.__column_name["timestamp"]} 
                         between '{time_start}' and '{time_end}'
                 order by {self.__column_name["timestamp"]} asc
