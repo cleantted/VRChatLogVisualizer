@@ -1,5 +1,5 @@
 import configparser
-import dao
+from dao import ActivityType, VRChatActivityLogsDao
 import datetime
 import heapq
 import operator
@@ -16,7 +16,7 @@ def pickup(d, limit):
     L = sorted(list(d.items()), key=operator.itemgetter(1), reverse=True)[:limit]
 
     res = ""
-    for i, (name, count) in enumerate(L):
+    for _, (name, count) in enumerate(L):
         res += f"{name}[{count}], "
     return res
 
@@ -25,7 +25,7 @@ class Analyzer:
     __invalid_datetime = "9999-99-99 23:59:59"
 
     def __init__(self, orner_name, home_world):
-        self.__dao = dao.VRChatActivityLogsDao()
+        self.__dao = VRChatActivityLogsDao()
         self.__orner_name = orner_name
         self.__home_world = home_world
         self.fetch_world_stay_time()
@@ -48,13 +48,13 @@ class Analyzer:
         buffer = {}
         player_data = []
         for user_name, timestamp, activity_type in players: 
-            if activity_type == self.__dao.activity_type["met_player"]:
+            if activity_type == int(ActivityType.MET_PLAYER):
                 if user_name in buffer:
                     print(f"[error] already added: {user_name} at {timestamp}", file=sys.stderr)
                     continue
 
                 buffer[user_name] = timestamp
-            elif activity_type == self.__dao.activity_type["leave_player"]:
+            elif activity_type == int(ActivityType.LEAVE_PLAYER):
                 if user_name not in buffer:
                     print(f"[error] not exist: {user_name} at {timestamp}", file=sys.stderr)
                     continue
