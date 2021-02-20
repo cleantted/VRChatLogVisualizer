@@ -1,17 +1,18 @@
 import analyzer
+import configparser
 import networkx as nx
 import matplotlib.pyplot as plt
 
 
-def relation_plot():
-    an = analyzer.Analyzer()
+def relation_plot(orner_name, home_world):
+    an = analyzer.Analyzer(orner_name, home_world)
 
     with open("./friends_list.txt", mode="r", encoding="utf-8") as f:
         friends_list = set(a.strip() for a in f.readlines())
 
     player_count = {}
     for world_name, _, pls in an.players:
-        if world_name == "VRChat Home":
+        if world_name == home_world:
             continue
         S = set(pl for _, _, pl in pls)
         for s in S:
@@ -33,7 +34,7 @@ def relation_plot():
                 continue
             if weight < 2:
                 continue
-            if pl == "cleantted":
+            if pl == orner_name:
                 continue
             G.add_edge(name, pl, weight=weight)
 
@@ -52,5 +53,11 @@ def relation_plot():
 
 
 if __name__ == "__main__":
-    relation_plot()
+    config_ini = configparser.ConfigParser()
+    config_ini.read("./config.ini", encoding="utf-8")
+
+    orner_name = config_ini["setting"]["orner_name"]
+    home_world = config_ini["setting"]["home_world"]
+
+    relation_plot(orner_name, home_world)
     pass
