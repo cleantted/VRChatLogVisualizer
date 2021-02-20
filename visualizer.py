@@ -28,9 +28,13 @@ def relation_plot(orner_name, home_world):
         S = set(pl for _, _, pl in pls)
         for s in S:
             player_count[s] = player_count.setdefault(s, 0) + 1
-
-    nodes = [(name, {"count": min(100, count)}) for name, count in player_count.items() if count > 4 and name in friends_list]
-    print(len(nodes))
+    print(f"player count size: {len(player_count)}")
+    nodes = [
+        (name, {"count": min(100, count)})    
+            for name, count in player_count.items() 
+            if count > 4 and name in friends_list
+    ]
+    print(f"nodes size: {len(nodes)}")
 
     G = nx.DiGraph()
     G.add_nodes_from(nodes)
