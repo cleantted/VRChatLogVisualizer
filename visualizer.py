@@ -4,6 +4,17 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 
+def convert_color(value):
+    if value > 10:
+        return 'r'
+    elif value > 5:
+        return "g"
+    elif value > 1:
+        return 'blue' 
+    else:
+        return 'white' 
+
+
 def relation_plot(orner_name, home_world):
     an = analyzer.Analyzer(orner_name, home_world)
 
@@ -44,7 +55,7 @@ def relation_plot(orner_name, home_world):
     nx.draw_networkx_nodes(G, pos, node_color='b', alpha=0.2, node_size=node_size)
     nx.draw_networkx_labels(G, pos, font_size=22, font_weight="bold", font_family='IPAPGothic')
 
-    edge_color = [ 'r' if d['weight'] > 10 else 'g' if d['weight'] > 5 else 'blue' if d['weight'] > 1 else 'white' for (_, _, d) in G.edges(data=True)]
+    edge_color = [convert_color(d['weight']) for (_, _, d) in G.edges(data=True)]
 
     edge_width = [ d['weight'] * 0.9 for (u,v,d) in G.edges(data=True)]
     nx.draw_networkx_edges(G, pos, alpha=0.4, edge_color=edge_color, width=edge_width)
