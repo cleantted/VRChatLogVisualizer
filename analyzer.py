@@ -12,6 +12,12 @@ def is_near_time(a_str, b_str):
     return (date_dt2 - date_dt1).seconds <= 1
 
 
+def diff_seconds(from_time, to_time):
+    date_dt1 = datetime.datetime.strptime(from_time, "%Y-%m-%d %H:%M:%S")
+    date_dt2 = datetime.datetime.strptime(to_time, "%Y-%m-%d %H:%M:%S")
+    return (date_dt2 - date_dt1).seconds
+
+
 def pickup(d, limit):
     L = sorted(list(d.items()), key=operator.itemgetter(1), reverse=True)[:limit]
 
@@ -28,9 +34,14 @@ class Analyzer:
         self.__dao = VRChatActivityLogsDao()
         self.__orner_name = orner_name
         self.__home_world = home_world
+    
+    def construct(self, by_time=False):
         self.fetch_world_stay_time()
         self.fetch_players_in_world()
-        self.fetch_players_relation()
+        if by_time:
+            self.fetch_players_relation_by_time()
+        else:
+            self.fetch_players_relation()
 
     def fetch_world_stay_time(self):
         df = self.__dao.fetch_world_join_time()
@@ -149,6 +160,31 @@ class Analyzer:
         # print(relation)
         self.relation = relation
 
+    def fetch_players_relation_by_time(self):
+        valid_player_data = filter(lambda x: x[1] != self.__invalid_datetime, self.players)
+        relation = {self.__orner_name: dict()}
+        for i, (world, time, pls) in enumerate(valid_player_data):
+            for in_time1, out_time1, pl1 in pls:
+                for in_time2, out_time2, pl2 in pls:
+                    if pl1 == pl2:
+                        continue
+                    
+                    if self.__invalid_datetime in (in_time1, out_time1, in_time2, out_time2):
+                        continue
+
+                    if in_time1 <= in_time2 <= out_time1 or in_time2 <= in_time1 <= out_time2:
+                        sec = diff_seconds(max(in_time1, in_time2), min(out_time1, out_time2))
+                        
+                        relation[pl1][pl2] = relation.setdefault(pl1, dict()).setdefault(pl2, 0) + sec
+                        relation[pl2][pl1] = relation.setdefault(pl2, dict()).setdefault(pl1, 0) + sec
+        
+        for pl, to_join_list in relation.items():
+            if max(to_join_list.values()) < 2:
+                continue
+            print(f"{pl}: {pickup(to_join_list, 5)}")
+        # print(relation)
+        self.relation = relation
+
 
 if __name__ == "__main__":
     config_ini = configparser.ConfigParser()
@@ -158,4 +194,5 @@ if __name__ == "__main__":
     home_world = config_ini["setting"]["home_world"]
 
     analyzer = Analyzer(orner_name, home_world)
+    analyzer.construct(by_time=True)
     print(analyzer.relation)
