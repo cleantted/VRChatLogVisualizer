@@ -7,12 +7,16 @@ import matplotlib.pyplot as plt
 def convert_color(value):
     if value > 86400:
         return 'r'
-    elif value > 21600:
+    elif value > 43200:
         return "g"
-    elif value > 7200:
+    elif value > 10800:
         return 'blue' 
     else:
         return 'gray' 
+
+
+def convert_node_color(name):
+    return "black"
 
 
 def relation_plot(orner_name, home_world, output_file_name):
@@ -57,13 +61,14 @@ def relation_plot(orner_name, home_world, output_file_name):
     plt.figure(figsize=(20, 20))
     pos = nx.spring_layout(G, k=35)
     node_size = [ d['count']*250 for (n,d) in G.nodes(data=True)]
-    nx.draw_networkx_nodes(G, pos, node_color='black', alpha=0.2, node_size=node_size)
+    node_color = [convert_node_color(n) for n in G.nodes()]
+    nx.draw_networkx_nodes(G, pos, node_color=node_color, alpha=0.5, node_size=node_size)
     nx.draw_networkx_labels(G, pos, font_size=22, font_weight="bold", font_family='IPAPGothic')
 
     edge_color = [convert_color(d['weight']) for (_, _, d) in G.edges(data=True)]
 
     edge_width = [ d['weight'] * 0.0002 for (u,v,d) in G.edges(data=True)]
-    nx.draw_networkx_edges(G, pos, alpha=0.4, edge_color=edge_color, width=edge_width)
+    nx.draw_networkx_edges(G, pos, alpha=0.3, edge_color=edge_color, width=edge_width)
     plt.axis("off")
     plt.savefig(output_file_name)
 
