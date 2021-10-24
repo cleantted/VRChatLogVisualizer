@@ -13,7 +13,7 @@ class ActivityType(IntEnum):
     SEND_FRIEND_REQUEST = 6
     RECEIVED_FRIEND_REQUEST = 7
     ACCEPT_FRIEND_REQUEST = 8
-    LEAVE_PLAYER = 9
+    LEAVE_PLAYER = 99
 
 
 class VRChatActivityLogsDao:
